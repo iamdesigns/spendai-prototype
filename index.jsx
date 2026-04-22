@@ -1,4 +1,34 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Target,
+  BarChart2,
+  ArrowUpDown,
+  TrendingUp,
+  Building2,
+  LayoutGrid,
+  Globe,
+  Compass,
+  ChevronDown,
+  MoreVertical,
+} from "lucide-react";
+
+// ── Data ────────────────────────────────────────────────────────────────────
 
 const companies = [
   {
@@ -13,246 +43,230 @@ const companies = [
 ];
 
 const statCards = [
-  { label: "Total Categories", value: "2", icon: "target" },
-  { label: "Total Suppliers", value: "11", icon: "chart" },
-  { label: "Total Transactions", value: "11", icon: "arrows" },
+  { label: "Total Categories", value: "2",  icon: Target },
+  { label: "Total Suppliers",  value: "11", icon: BarChart2 },
+  { label: "Total Transactions", value: "11", icon: ArrowUpDown },
 ];
 
-function TargetIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-      <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
-    </svg>
-  );
-}
+const navItems = [
+  { key: "portfolio",  label: "Portfolio",  Icon: LayoutGrid },
+  { key: "spendcube", label: "SpendCube",  Icon: Globe },
+  { key: "explore",   label: "Explore",    Icon: Compass },
+];
 
-function ChartIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-      <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
-    </svg>
-  );
-}
+// ── Sub-components ───────────────────────────────────────────────────────────
 
-function ArrowsIcon() {
+function Logo() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-      <path d="M7 16V4m0 0L3 8m4-4 4 4" /><path d="M17 8v12m0 0 4-4m-4 4-4-4" />
-    </svg>
-  );
-}
-
-function StatCard({ label, value, icon }) {
-  return (
-    <div style={{
-      flex: 1,
-      border: "1px solid #e4e4e7",
-      borderRadius: 12,
-      padding: "16px 20px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      background: "#fff",
-    }}>
-      <div>
-        <div style={{ fontSize: 12, color: "#71717a", marginBottom: 8 }}>{label}</div>
-        <div style={{ fontSize: 22, fontWeight: 500, color: "#09090b" }}>{value}</div>
+    <div className="flex items-center gap-2">
+      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-foreground">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path
+            d="M8 2L13 5V11L8 14L3 11V5L8 2Z"
+            stroke="#e5ff2c"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          <circle cx="8" cy="8" r="2" fill="#e5ff2c" />
+        </svg>
       </div>
-      <div style={{
-        width: 36, height: 36, borderRadius: 8, background: "#09090b",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        {icon === "target" && <TargetIcon />}
-        {icon === "chart" && <ChartIcon />}
-        {icon === "arrows" && <ArrowsIcon />}
+      <span className="text-sm font-semibold tracking-tight">spendAi</span>
+    </div>
+  );
+}
+
+function NavLink({ item, active, onClick }) {
+  const { label, Icon } = item;
+  return (
+    <button
+      onClick={onClick}
+      className={[
+        "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs transition-colors",
+        active
+          ? "bg-muted font-medium text-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+      ].join(" ")}
+    >
+      <Icon className="h-3 w-3" />
+      {label}
+    </button>
+  );
+}
+
+function StatCard({ label, value, icon: Icon }) {
+  return (
+    <Card className="flex-1">
+      <CardContent className="flex items-center justify-between p-4">
+        <div>
+          <p className="text-xs text-muted-foreground mb-1.5">{label}</p>
+          <p className="text-xl font-medium">{value}</p>
+        </div>
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground text-background flex-shrink-0">
+          <Icon className="h-4 w-4" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CompanyRow({ co }) {
+  return (
+    <div className="flex items-center justify-between px-4 py-3">
+      {/* Left */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-[#d7b1ff]">
+          <Building2 className="h-4 w-4 text-[#3C3489]" />
+        </div>
+        <div>
+          <p className="text-xs font-medium mb-1">{co.name}</p>
+          <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Target className="h-2.5 w-2.5" />
+              {co.categories} Categories
+            </span>
+            <span className="flex items-center gap-1">
+              <BarChart2 className="h-2.5 w-2.5" />
+              {co.suppliers} Suppliers
+            </span>
+            <span className="flex items-center gap-1">
+              <ArrowUpDown className="h-2.5 w-2.5" />
+              {co.transactions} Transactions
+            </span>
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-0.5">{co.updated}</p>
+        </div>
+      </div>
+
+      {/* Right */}
+      <div className="flex items-center gap-2.5">
+        <span className="text-xl font-bold tracking-tight">{co.amount}</span>
+        <Badge
+          className="rounded-full bg-[#e5ff2c] text-[#263b30] hover:bg-[#e5ff2c] border-none text-xs font-medium px-3 cursor-default"
+        >
+          Analyze Spend
+        </Badge>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
+              <MoreVertical className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">Remove</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
 }
 
-function Badge({ children, variant = "outline" }) {
-  const styles = {
-    outline: { background: "transparent", border: "1px solid #e4e4e7", color: "#09090b" },
-    yellow: { background: "#e5ff2c", border: "none", color: "#263b30" },
-    purple: { background: "#d7b1ff", border: "none", color: "#3C3489" },
-  };
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 4,
-      padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 500,
-      cursor: "default", ...styles[variant],
-    }}>
-      {children}
-    </span>
-  );
-}
-
-function NavLink({ children, active, onClick }) {
-  return (
-    <button onClick={onClick} style={{
-      display: "flex", alignItems: "center", gap: 6,
-      padding: "5px 10px", borderRadius: 8, fontSize: 13,
-      color: active ? "#09090b" : "#71717a",
-      background: active ? "#f4f4f5" : "transparent",
-      border: "none", cursor: "pointer", fontWeight: active ? 500 : 400,
-    }}>
-      {children}
-    </button>
-  );
-}
+// ── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("portfolio");
 
   return (
-    <div style={{ fontFamily: "'Geist', sans-serif", background: "#fff", minHeight: "100vh", color: "#09090b" }}>
+    <div className="min-h-screen bg-background text-foreground font-sans">
 
       {/* Nav */}
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 24px", borderBottom: "1px solid #e4e4e7" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 15 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: "#09090b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M8 2L13 5V11L8 14L3 11V5L8 2Z" stroke="#e5ff2c" strokeWidth="1.5" fill="none" />
-                <circle cx="8" cy="8" r="2" fill="#e5ff2c" />
-              </svg>
-            </div>
-            spendAi
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <NavLink active={activeNav === "portfolio"} onClick={() => setActiveNav("portfolio")}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-              </svg>
-              Portfolio
-            </NavLink>
-            <NavLink active={activeNav === "spendcube"} onClick={() => setActiveNav("spendcube")}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-              SpendCube
-            </NavLink>
-            <NavLink active={activeNav === "explore"} onClick={() => setActiveNav("explore")}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-              </svg>
-              Explore
-            </NavLink>
+      <nav className="flex items-center justify-between border-b px-6 py-2.5">
+        <div className="flex items-center gap-4">
+          <Logo />
+          <div className="flex items-center gap-1">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.key}
+                item={item}
+                active={activeNav === item.key}
+                onClick={() => setActiveNav(item.key)}
+              />
+            ))}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#d7b1ff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "#3C3489" }}>
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#d7b1ff] text-[10px] font-semibold text-[#3C3489]">
             P
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 500 }}>Carl's Account</div>
-            <div style={{ fontSize: 11, color: "#71717a" }}>paul@spendai.com</div>
+            <p className="text-xs font-medium leading-tight">Carl's Account</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">paul@spendai.com</p>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
         </div>
       </nav>
 
       {/* Hero */}
-      <div style={{ padding: "28px 24px 20px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <div className="flex items-start justify-between px-6 pt-6 pb-4">
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.1, marginBottom: 8, whiteSpace: "nowrap" }}>
+          <h1 className="text-2xl font-extrabold tracking-tight leading-tight mb-1">
             Carl's Account Dashboard
           </h1>
-          <p style={{ fontSize: 14, color: "#71717a", maxWidth: 480, lineHeight: 1.6 }}>
+          <p className="text-xs text-muted-foreground">
             Comprehensive spend analysis across your portfolio companies
           </p>
         </div>
-        <div style={{ background: "#e5ff2c", borderRadius: 10, padding: "12px 16px", minWidth: 160, flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "#263b30", marginBottom: 4 }}>
+        <div className="rounded-md bg-[#e5ff2c] px-3 py-2 min-w-[130px] flex-shrink-0">
+          <div className="flex items-center justify-between text-[10px] font-medium text-[#263b30] mb-1">
             Total Spend
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#263b30" strokeWidth="2">
-              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-              <polyline points="16 7 22 7 22 13" />
-            </svg>
+            <TrendingUp className="h-3 w-3" />
           </div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#263b30", letterSpacing: -0.5 }}>$709,795</div>
+          <p className="text-lg font-bold tracking-tight text-[#263b30]">$709,795</p>
         </div>
       </div>
 
       {/* Stat Cards */}
-      <div style={{ padding: "0 24px 24px", display: "flex", gap: 16 }}>
+      <div className="flex gap-3 px-6 pb-4">
         {statCards.map((card) => (
           <StatCard key={card.label} {...card} />
         ))}
       </div>
 
-      {/* Section header */}
-      <div style={{ padding: "0 24px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>Portfolio Companies</div>
-          <div style={{ fontSize: 12, color: "#71717a", marginTop: 2 }}>Detailed view of selected companies</div>
-        </div>
-        <Badge variant="purple">+ Add Company</Badge>
-      </div>
-
-      {/* Company list */}
-      <div style={{ padding: "0 24px", display: "flex", flexDirection: "column", gap: 8 }}>
-        {companies.map((co) => (
-          <div key={co.id} style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "16px", border: "1px solid #e4e4e7", borderRadius: 12, background: "#fff",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: "#d7b1ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3C3489" strokeWidth="2">
-                  <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-                  <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-                  <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 6 }}>{co.name}</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#71717a" }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                    {co.categories} Categories
-                  </span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#71717a" }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                    {co.suppliers} Suppliers
-                  </span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#71717a" }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 16V4m0 0L3 8m4-4 4 4"/><path d="M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
-                    {co.transactions} Transactions
-                  </span>
-                </div>
-                <div style={{ fontSize: 11, color: "#71717a", marginTop: 4 }}>{co.updated}</div>
-              </div>
+      {/* Portfolio Companies */}
+      <div className="px-6 pb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
+            <div>
+              <CardTitle className="text-sm font-semibold">Portfolio Companies</CardTitle>
+              <CardDescription className="text-xs mt-0.5">
+                Detailed view of selected companies
+              </CardDescription>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.5 }}>{co.amount}</span>
-              <Badge variant="yellow">Analyze Spend</Badge>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2">
-                <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
-              </svg>
-            </div>
-          </div>
-        ))}
+            <Badge className="rounded-full bg-[#d7b1ff] text-[#3C3489] hover:bg-[#d7b1ff] border-none text-xs font-medium px-3 cursor-default">
+              + Add Company
+            </Badge>
+          </CardHeader>
+          <Separator />
+          <CardContent className="p-0">
+            {companies.map((co, i) => (
+              <div key={co.id}>
+                <CompanyRow co={co} />
+                {i < companies.length - 1 && <Separator />}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Footer */}
-      <div style={{ padding: "32px 24px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid #e4e4e7", marginTop: 40 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 20, height: 20, borderRadius: 4, background: "#09090b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2L13 5V11L8 14L3 11V5L8 2Z" stroke="#e5ff2c" strokeWidth="1.5" fill="none"/>
+      <footer className="flex items-center justify-between border-t px-6 py-3 mt-8">
+        <div className="flex items-center gap-2">
+          <div className="flex h-5 w-5 items-center justify-center rounded bg-foreground">
+            <svg width="9" height="9" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2L13 5V11L8 14L3 11V5L8 2Z" stroke="#e5ff2c" strokeWidth="1.5" fill="none" />
             </svg>
           </div>
-          <span style={{ fontSize: 12, color: "#71717a" }}>© 2026 SpendAi. All rights reserved.</span>
+          <span className="text-[10px] text-muted-foreground">© 2026 SpendAi. All rights reserved.</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div className="flex items-center gap-4">
           {["Guides", "Status", "Support", "Terms"].map((link) => (
-            <span key={link} style={{ fontSize: 12, color: "#71717a", cursor: "pointer" }}>{link}</span>
+            <span key={link} className="text-[10px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+              {link}
+            </span>
           ))}
         </div>
-      </div>
+      </footer>
 
     </div>
   );
